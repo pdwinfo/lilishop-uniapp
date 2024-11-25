@@ -793,8 +793,8 @@ export default {
       getGoodsList({
         pageNumber: 1,
         pageSize: 10,
-        category: this.goodsDetail.categoryId,
-        keyword: this.goodsDetail.name,
+        currentGoodsId: this.goodsDetail.id,
+        keyword: this.goodsDetail.name
       }).then((res) => {
         this.likeGoodsList = res.data.result.records;
       });
