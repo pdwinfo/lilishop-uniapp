@@ -89,6 +89,19 @@ export function smsLogin(params, clientType) {
 
 export function modifyPass(params) {
   return http.request({
+    url: `/passport/member/modifyPass`,
+    method: "PUT",
+    params,
+  });
+}
+
+/**
+ * 修改密码
+ * @param  newPassword
+ * @param  password
+ */
+export function resetPassword(params) {
+  return http.request({
     url: `/passport/member/resetPassword`,
     method: "POST",
     params,

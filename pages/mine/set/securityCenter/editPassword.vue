@@ -44,7 +44,7 @@
 	import {
 		sendMobile,
 		resetByMobile,
-		modifyPass
+		resetPassword
 	} from "@/api/login";
 
 	import {
@@ -144,7 +144,7 @@
 					});
 					return;
 				}
-				modifyPass({
+				resetPassword({
 					password: md5(this.password),
 				}).then((res) => {
 					if (res.data.success) {
