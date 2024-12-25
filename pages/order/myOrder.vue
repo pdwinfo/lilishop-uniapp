@@ -613,7 +613,7 @@ export default {
     navigateToLogistics(order) {
       uni.navigateTo({
         url:
-          "/pages/mine/msgTips/packageMsg/logisticsDetail?order_sn=" + order.sn,
+          "/pages/order/deliverDetail?order_sn=" + order.sn,
       });
     },
   },
