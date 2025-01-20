@@ -367,15 +367,17 @@
 								storage.setUserInfo(user.data.result);
 								storage.setHasLogin(true);
 							}else {
-								uni.showToast({
-									title: user.data.message,
-									icon: "none",
-								});
-								storage.setAccessToken('');
-								storage.setRefreshToken('');
-								uni.switchTab({
-									url: "/pages/tabbar/user/my",
-								});
+								setTimeout(() => {
+									uni.showToast({
+										title: user.data.message,
+										icon: "none",
+									});
+									storage.setAccessToken('');
+									storage.setRefreshToken('');
+									uni.switchTab({
+										url: "/pages/tabbar/user/my",
+									});
+								}, 500);
 							}
 						});
 						getCurrentPages().length > 1 ?
@@ -515,15 +517,17 @@
 									});
 								}
 							} else {
-								uni.showToast({
-									title: user.data.message,
-									icon: "none",
-								});
-								storage.setAccessToken('');
-								storage.setRefreshToken('');
-								uni.switchTab({
-									url: "/pages/tabbar/user/my",
-								});
+								setTimeout(() => {
+									uni.showToast({
+										title: user.data.message,
+										icon: "none",
+									});
+									storage.setAccessToken('');
+									storage.setRefreshToken('');
+									uni.switchTab({
+										url: "/pages/tabbar/user/my",
+									});
+								}, 500);
 							}
 						});
 					}
@@ -591,22 +595,26 @@
 							storage.setAutoCp(0)
 							// 登录成功
 							uni.showToast({
-								title: "登录成功!",
+								title:"提示",
+								content: "登录成功!",
 								icon: "none",
 							});
 
 
 							whetherNavigate();
 						}else{
-							uni.showToast({
+							setTimeout(() => {
+								uni.showToast({
 									title: user.data.message,
 									icon: "none",
 								});
-							storage.setAccessToken('');
-							storage.setRefreshToken('');
-							uni.switchTab({
-								url: "/pages/tabbar/user/my",
-							});
+								storage.setAccessToken('');
+								storage.setRefreshToken('');
+								uni.switchTab({
+									url: "/pages/tabbar/user/my",
+								});
+							}, 500);
+
 						}
 					});
 				}
