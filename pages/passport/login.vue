@@ -363,8 +363,16 @@
 							icon: "none",
 						});
 						getUserInfo().then((user) => {
-							storage.setUserInfo(user.data.result);
-							storage.setHasLogin(true);
+							if(user.data.success){
+								storage.setUserInfo(user.data.result);
+								storage.setHasLogin(true);
+							}else {
+								storage.setAccessToken('');
+								storage.setRefreshToken('');
+								uni.switchTab({
+									url: "/pages/tabbar/user/my",
+								});
+							}
 						});
 						getCurrentPages().length > 1 ?
 							uni.navigateBack({
@@ -503,8 +511,10 @@
 									});
 								}
 							} else {
+								storage.setAccessToken('');
+								storage.setRefreshToken('');
 								uni.switchTab({
-									url: "/pages/tabbar/home/index",
+									url: "/pages/tabbar/user/my",
 								});
 							}
 						});
@@ -556,7 +566,6 @@
 
 			// 登录成功之后获取用户信息
 			getUserInfoMethods(res) {
-				console.log(res);
 				if (res.data.success) {
 					storage.setAccessToken(res.data.result.accessToken);
 					storage.setRefreshToken(res.data.result.refreshToken);
@@ -582,9 +591,12 @@
 							whetherNavigate();
 
 						} else {
+							storage.setAccessToken('');
+							storage.setRefreshToken('');
 							uni.switchTab({
-								url: "/pages/tabbar/home/index",
+								url: "/pages/tabbar/user/my",
 							});
+
 						}
 					});
 				}
