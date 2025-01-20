@@ -367,6 +367,10 @@
 								storage.setUserInfo(user.data.result);
 								storage.setHasLogin(true);
 							}else {
+								uni.showToast({
+									title: user.data.message,
+									icon: "none",
+								});
 								storage.setAccessToken('');
 								storage.setRefreshToken('');
 								uni.switchTab({
@@ -511,6 +515,10 @@
 									});
 								}
 							} else {
+								uni.showToast({
+									title: user.data.message,
+									icon: "none",
+								});
 								storage.setAccessToken('');
 								storage.setRefreshToken('');
 								uni.switchTab({
@@ -589,14 +597,16 @@
 
 
 							whetherNavigate();
-
-						} else {
+						}else{
+							uni.showToast({
+									title: user.data.message,
+									icon: "none",
+								});
 							storage.setAccessToken('');
 							storage.setRefreshToken('');
 							uni.switchTab({
 								url: "/pages/tabbar/user/my",
 							});
-
 						}
 					});
 				}
