@@ -567,7 +567,7 @@ export default {
         // }, 500);
       }
       // 这里是绑定分销员
-      if (distributionId || this.$store.state.distributionId) {
+      if ((distributionId || this.$store.state.distributionId) && this.$options.filters.isLogin("auth")) {
         let disResult = await getGoodsDistribution(distributionId);
         if (!disResult.data.success || disResult.statusCode == 403) {
           this.$store.state.distributionId = distributionId;
@@ -793,8 +793,8 @@ export default {
       getGoodsList({
         pageNumber: 1,
         pageSize: 10,
-        category: this.goodsDetail.categoryId,
-        keyword: this.goodsDetail.name,
+        currentGoodsId: this.goodsDetail.id,
+        keyword: this.goodsDetail.name
       }).then((res) => {
         this.likeGoodsList = res.data.result.records;
       });

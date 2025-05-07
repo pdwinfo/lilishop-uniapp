@@ -158,36 +158,36 @@
         </view>
       </view>
 
-      <!-- loading是显示 -->
-      <!-- <view v-show="msgLoad" class=" margin-left margin-top">
-        <view class="chat-img flex-row-center">
-          <image style="height: 75rpx;width: 75rpx;" src="../../static/image/robt.png" mode="aspectFit"></image>
-        </view>
-        <view class="flex" style="width: 500rpx;">
-          <view class="margin-left padding-chat flex-column-start"
-            style="border-radius: 35rpx;background-color: #f9f9f9;">
-            <view class="cuIcon-loading turn-load" style="font-size: 35rpx;color: #3e9982;">
-
-            </view>
-          </view>
-        </view>
-      </view> -->
       <!-- 防止消息底部被遮 -->
-      <view style="height: 120rpx;">
+      <view  style="height: 120rpx;">
       </view>
     </view>
     <!-- 底部导航栏 -->
-    <view :style="{position: 'fixed',bottom:inputHeight+'px'}" class="flex-column-center"  :animation="animationData">
+    <view :style="{position: 'fixed', bottom:inputHeight+'px'}" class="flex-column-center bottom-dh"  :animation="animationData">
       <view class="bottom-dh-char flex-row-around" style="font-size: 55rpx;">
         <!-- vue无法使用软键盘"发送" -->
-        <input @focus="inputBindFocus" @blur="eventHandle"  :adjust-position="false" v-model="msg" class="dh-input" type="text" style="background-color: #f0f0f0;" @confirm="sendMessage"
-          confirm-type="send"  placeholder="用一句简短的话描述您的问题" />
+
+        <!-- #ifndef MP-WEIXIN -->
+         <div v-if="!isShow" @click="navigateToBottom"  class="dh-input">
+          用一句简短的话描述您的问题
+         </div>
+         <input v-show="isShow" ref="inputRef" :focus="isShow"  @focus="inputBindFocus" @blur="eventHandle" :adjust-position="false" v-model="msg" class="dh-input" type="text" style="background-color: #f0f0f0;" @confirm="sendMessage"
+         confirm-type="send"  placeholder="用一句简短的话描述您的问题" />
+         <!-- #endif  -->
+
+         <!-- #ifdef MP-WEIXIN -->
+         <input  ref="inputRef"   @focus="inputBindFocus" @blur="eventHandle" :adjust-position="false" v-model="msg" class="dh-input" type="text" style="background-color: #f0f0f0;" @confirm="sendMessage"
+         confirm-type="send"  placeholder="用一句简短的话描述您的问题" />
+         <!-- #endif -->
+
         <view @click="sendMessage" class="cu-tag bg-main-color send round">
-          发送
+          发送 
         </view>
+       
         <!-- <text @click="ckAdd" class="cuIcon-roundaddfill text-brown"></text> -->
       </view>
     </view>
+    <div id="bottom"></div>
   </view>
 </template>
 
@@ -233,26 +233,7 @@ export default {
     if (this.resolve.goodsid) {
       this.commodityDetails()
     }
-    // 如果需要缓存消息缓存msgList即可
-    // 监听键盘拉起
-    // 因为无法控制键盘拉起的速度,所以这里尽量以慢速处理
-    uni.onKeyboardHeightChange(res => {
-      const query = uni.createSelectorQuery()
-      query.select('#msgList').boundingClientRect(data => {
-        // 若消息体没有超过2倍的键盘则向下移动差值,防止遮住消息体
-        var up = res.height * 2 - data.height - l * 110
-        if (up > 0) {
-          // 动态改变空盒子高度
-          this.messageBoxMove(up, 300)
-          // 记录改变的值,若不收回键盘且发送了消息用来防止消息过多被遮盖
-          mgUpHeight = up
-        }
-        // 收回
-        if (res.height == 0) {
-          this.messageBoxMove(0, 0)
-        }
-      }).exec();
-    })
+ 
     var query = uni.getSystemInfoSync()
 
     l = query.screenWidth / 750
@@ -270,8 +251,12 @@ export default {
     }
 
     // this.ws.connect();
-    this.sokcet();
+    this.socket();
   },
+
+
+
+
   // 页面隐藏
   onHide () {
     uni.closeSocket();
@@ -321,30 +306,65 @@ export default {
       goodListData: {},
       count: 0, //判断socket断开连接请求次数
       inputHeight:0,
+      isShow:false,
+    
+   
     }
   },
-  // watch: {
-  //   'ws.callBackMapping': {
-  //     handler: function (val) {
-  //       val = JSON.parse(val)
-  //       if (val.messageResultType == 'MESSAGE') {
-  //         this.msgList.push(val.result)
-  //       }
-  //       this.newMessageNum++;
-  //       //接收到消息后发送已读
-  //       let msg = val
-  //       msg.operation_type = 'READ'
-  //       this.ws.send(JSON.stringify(msg))
-  //     }
-  //   }
-  // },
+  onPageScroll (e) {
+ 
+    // #ifdef APP-PLUS
+    uni.hideKeyboard()
+    this.isShow = false
+    // #endif
+  },
   methods: {
+    navigateToBottom(){
+      // #ifdef H5
+      this.isShow = true
+      this.$refs.inputRef.focus()
+      // #endif
+
+      // #ifdef APP-PLUS
+      this.$nextTick(() => {
+        uni.pageScrollTo({
+          scrollTop: 5000000,
+          duration: 50,
+          success: () => {
+           setTimeout(() => { 
+            this.isShow = true
+           }, 200);
+          ;
+          },
+          fail: () => { },
+          complete: () => {}
+        });
+      });
+      // #endif
+      
+    },
+
     eventHandle(){
+     
       this.inputHeight = 0
+      this.isShow = false
     },
     inputBindFocus(e){
        if (e.detail.height) {
-           this.inputHeight = e.detail.height //这个高度就是软键盘的高度
+     
+       
+          // #ifdef APP-PLUS
+          // 判断是否是ios
+          if (uni.getSystemInfoSync().platform == 'ios') {
+            this.inputHeight = e.detail.height - 40 //这个高度就是软键盘的高度
+          }else{
+            this.inputHeight = e.detail.height
+          }
+         //  #endif
+        
+          // #ifndef APP-PLUS
+          this.inputHeight = e.detail.height //这个高度就是软键盘的高度
+          //  #endif
        }
     },
     sendMessage () {
@@ -404,7 +424,7 @@ export default {
         });
       })
     },
-    sokcet () {
+    socket () {
       var _this = this;
       uni.closeSocket();
       this.socketOpen = false;
@@ -455,7 +475,7 @@ export default {
       // 监听是否断线，断线进行重新连接
       uni.onSocketClose((res) => {
         if (res.code != null && res.code != 1000) {
-          this.sokcet()
+          this.socket()
         }
       })
     },
@@ -825,6 +845,7 @@ export default {
   margin-left: 10rpx;
 }
 .dh-input {
+  line-height: 65rpx;
   width: 500rpx;
   height: 65rpx;
   border-radius: 30rpx;
@@ -871,6 +892,19 @@ uni-page-head {
   right: 0;
   z-index: 9999;
 }
+.bottom-dh{
+  position: fixed;   // input 所在盒子设置绝对定位
+  flex-shrink: 0;
+  width: 100%;
+  left: 0;
+  bottom: 0;  // 默认 0
+  z-index: 199;
+  padding-bottom: env(safe-area-inset-bottom);
+  background: #FFFFFF;
+  box-sizing: border-box;
+
+}
+
 </style>
 
 <style lang="scss" scoped>
